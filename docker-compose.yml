@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=development
+      - APP_SECRET_KEY=demo-secret-key-change-in-production-32chars
+      - USE_MOCK_GRAPH=true
+      - USE_MOCK_STT=true
+      - USE_MOCK_TTS=true
+      - DATABASE_URL=sqlite+aiosqlite:///./data/ipa.db
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./backend/data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://localhost:8000
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
