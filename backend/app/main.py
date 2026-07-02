@@ -42,9 +42,13 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
         settings.APP_ENV,
         settings.is_mock_mode,
     )
-    # Ensure log directory exists
+    # Ensure log directory exists (best-effort — read-only filesystems, e.g.
+    # serverless, should not prevent the app from starting)
     import os
-    os.makedirs("./logs", exist_ok=True)
+    try:
+        os.makedirs("./logs", exist_ok=True)
+    except OSError:
+        pass
     yield
     log.info("IPA shutting down")
 

@@ -89,7 +89,10 @@ class AuditLogger:
         self._entries: list[AuditEntry] = []
         self._lock = asyncio.Lock()
         self._log_path = Path(log_file)
-        self._log_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            self._log_path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass  # Read-only filesystem — fall back to in-memory-only buffer
 
     async def log(
         self,
