@@ -1,61 +1,142 @@
 # Convo — Voice Assistant for Corporate Managers
 
-Convo is a browser-based voice assistant I built as my final-year computing project. The idea was simple: corporate managers spend a lot of time triaging emails and chasing calendar slots — Convo lets them do all of that by just speaking naturally.
+**Convo** is a browser-based voice assistant developed as a final-year computing project. It is designed to help corporate managers reduce the time spent triaging emails, managing calendars, and coordinating meetings.
 
-You can say things like *"Schedule a meeting with Sarah tomorrow at 2 PM"* or *"Summarise my unread emails"* and Convo figures out what you mean, asks for confirmation where it matters, and gets it done. It runs entirely in demo mode out of the box — no Azure account or API keys needed to try it.
+Instead of navigating multiple applications, users can interact with Convo using natural language. For example:
+
+> “Schedule a meeting with Sarah tomorrow at 2 PM.”
+
+or:
+
+> “Summarise my unread emails.”
+
+Convo interprets the request, asks for confirmation when an action is potentially sensitive or destructive, and then carries out the task.
+
+The application runs entirely in **demo mode out of the box**, so no Azure account or API keys are required to explore its core functionality.
 
 ---
 
-## What it does
+## Features
 
-- **Voice and text commands** — speak or type; Convo understands natural language using a hybrid classifier (regex rules + optional GPT-4o-mini fallback for edge cases)
-- **Email** — read your inbox, view messages, get AI-generated summaries, compose and send with a confirmation step
-- **Calendar** — see today's schedule or the full week, create, update and delete meetings, check team availability
-- **Manager team view** — managers can pull up any team member's calendar; employees can only see their own
-- **Role-based access control** — three roles (Employee, Manager, Admin) with a strict permission matrix enforced on every API route
-- **Confirmation flow** — anything risky (sending an email, deleting a meeting) gets staged first and waits for you to say yes
-- **Audit trail** — every sensitive action is written to an append-only log; email bodies and voice transcripts are never stored
+### Voice and Text Commands
+
+* Speak or type commands using natural language.
+* Hybrid intent classification using:
+
+  * Deterministic regex-based rules.
+  * Optional GPT-4o-mini fallback for ambiguous requests.
+* Entity extraction for dates, times, people, and actions.
+
+### Email
+
+* Read inbox messages.
+* View individual emails.
+* Generate AI-powered email summaries.
+* Compose and send emails.
+* Require confirmation before sending emails.
+
+### Calendar
+
+* View today's schedule.
+* View the full week's schedule.
+* Create meetings.
+* Update existing meetings.
+* Delete meetings.
+* Check availability.
+
+### Manager Team View
+
+* Managers can view team members' calendars.
+* Employees can only access their own calendars.
+* Access is enforced through role-based permissions.
+
+### Role-Based Access Control
+
+Convo provides three user roles:
+
+* **Employee**
+* **Manager**
+* **Admin**
+
+Permissions are enforced across API routes using a central RBAC system.
+
+### Confirmation Flow
+
+Potentially risky actions are staged before execution.
+
+For example:
+
+> “Delete my 3 PM meeting.”
+
+Convo first prepares the deletion and waits for confirmation before carrying it out.
+
+This applies to actions such as:
+
+* Sending emails.
+* Deleting meetings.
+* Other sensitive operations.
+
+### Audit Trail
+
+Sensitive actions are recorded in an append-only audit log.
+
+Logged events include:
+
+* Login attempts.
+* Email access and sending.
+* Calendar modifications.
+* Team calendar access.
+* Voice command classifications.
+* Permission denials.
+
+**Email bodies and voice transcripts are never stored.**
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Version |
-|---|---|---|
-| Backend framework | FastAPI + Uvicorn | 0.111 / 0.29 |
-| Data validation | Pydantic v2 | 2.7.1 |
-| Auth | MSAL + python-jose (JWT HS256) | 1.28 / 3.3 |
-| Password hashing | passlib bcrypt | 1.7.4 |
-| HTTP client | httpx | 0.27 |
-| Database (ORM) | SQLAlchemy + aiosqlite | 2.0.30 |
-| Migrations | Alembic | 1.13.1 |
-| Graph API | Microsoft Graph REST v1.0 | — |
-| STT | Browser Web Speech API / OpenAI Whisper | — |
-| TTS | Browser `speechSynthesis` / OpenAI tts-1 | — |
-| Logging | structlog | 24.1 |
-| Frontend framework | React 18 + TypeScript + Vite | 18.3 / 5.4 / 5.2 |
-| Server state | TanStack Query v5 | 5.40 |
-| Client state | Zustand v4 | 4.5 |
-| Styling | Tailwind CSS v3 | 3.4 |
-| Router | React Router v6 | 6.23 |
-| Icons | Lucide React | 0.379 |
+| Layer                 | Technology                              | Version          |
+| --------------------- | --------------------------------------- | ---------------- |
+| Backend framework     | FastAPI + Uvicorn                       | 0.111 / 0.29     |
+| Data validation       | Pydantic v2                             | 2.7.1            |
+| Authentication        | MSAL + python-jose (JWT HS256)          | 1.28 / 3.3       |
+| Password hashing      | Passlib + bcrypt                        | 1.7.4            |
+| HTTP client           | httpx                                   | 0.27             |
+| Database / ORM        | SQLAlchemy + aiosqlite                  | 2.0.30           |
+| Database migrations   | Alembic                                 | 1.13.1           |
+| Microsoft integration | Microsoft Graph REST API v1.0           | —                |
+| Speech-to-text        | Browser Web Speech API / OpenAI Whisper | —                |
+| Text-to-speech        | Browser speechSynthesis / OpenAI TTS    | —                |
+| Logging               | structlog                               | 24.1             |
+| Frontend              | React + TypeScript + Vite               | 18.3 / 5.4 / 5.2 |
+| Server state          | TanStack Query                          | 5.40             |
+| Client state          | Zustand                                 | 4.5              |
+| Styling               | Tailwind CSS                            | 3.4              |
+| Routing               | React Router                            | 6.23             |
+| Icons                 | Lucide React                            | 0.379            |
 
 ---
 
-## Getting started
+## Getting Started
 
-### What you need
+### Prerequisites
 
-- Python 3.11+
-- Node.js 18+
-- Chrome or Edge (for the microphone / Web Speech API)
-- Azure AD app registration *(optional — only needed for live Microsoft 365 data)*
-- OpenAI API key *(optional — only needed for Whisper STT and tts-1 voice output)*
+You will need:
 
-### 1. Start the backend
+* Python 3.11+
+* Node.js 18+
+* Chrome or Edge for microphone access and the Web Speech API
+
+The following are **optional** and only required for live integrations:
+
+* Azure AD application registration
+* OpenAI API key
+
+### 1. Start the Backend
 
 ```bash
 cd backend
+
 python -m venv .venv
 
 # macOS / Linux
@@ -65,195 +146,265 @@ source .venv/bin/activate
 .venv\Scripts\activate
 
 pip install -r requirements.txt
+
 cp .env.example .env
+
 uvicorn app.main:app --reload
 ```
 
-The API runs at `http://localhost:8000` and the interactive docs are at `http://localhost:8000/docs`.
+The backend API will be available at:
 
-### 2. Start the frontend
+`http://localhost:8000`
+
+Interactive API documentation:
+
+`http://localhost:8000/docs`
+
+### 2. Start the Frontend
 
 ```bash
 cd frontend
+
 npm install
 npm run dev
 ```
 
-The app opens at `http://localhost:5173`.
+The frontend will be available at:
 
-### 3. Log in (no credentials needed)
+`http://localhost:5173`
 
-Head to `http://localhost:5173/login` and pick a demo role:
+### 3. Log In
 
-| Role | Persona | What they can do |
-|---|---|---|
-| **Manager** | Alex Morgan | Email, calendar, voice commands, view team calendars, audit log |
-| **Employee** | Jamie Lee | Own email and calendar only |
-| **Admin** | Admin User | Everything, including the diagnostics panel |
+Open:
+
+`http://localhost:5173/login`
+
+No credentials are required in demo mode. Select one of the available demo roles:
+
+| Role         | Persona     | Capabilities                                               |
+| ------------ | ----------- | ---------------------------------------------------------- |
+| **Manager**  | Alex Morgan | Email, calendar, voice commands, team calendars, audit log |
+| **Employee** | Jamie Lee   | Own email and calendar                                     |
+| **Admin**    | Admin User  | All features, including diagnostics                        |
 
 ---
 
 ## Docker
 
-If you'd rather not set up Python and Node separately:
+If you prefer not to install Python and Node.js dependencies separately, you can run the entire application using Docker:
 
 ```bash
 docker compose up --build
 ```
 
-- App: `http://localhost:5173`
-- API: `http://localhost:8000`
-- API docs: `http://localhost:8000/docs`
+The services will be available at:
+
+| Service           | URL                          |
+| ----------------- | ---------------------------- |
+| Application       | `http://localhost:5173`      |
+| API               | `http://localhost:8000`      |
+| API documentation | `http://localhost:8000/docs` |
 
 ---
 
-## Demo mode
+## Demo Mode
 
-Everything works out of the box without any external accounts. Here's what swaps in when you're running in demo mode:
+Convo is designed to work without external accounts or API keys.
 
-| Component | Demo mode | Live mode |
-|---|---|---|
-| Email & Calendar data | Realistic Contoso Corporation mock data | Live Microsoft 365 via Graph API |
-| Speech-to-Text | Browser Web Speech API | OpenAI Whisper |
-| Text-to-Speech | Browser `window.speechSynthesis` | OpenAI tts-1 |
-| Authentication | Local mock login with role selector | Microsoft Azure AD OAuth 2.0 |
-| Intent fallback | Regex rules engine only | Regex rules + GPT-4o-mini |
+Demo mode replaces external services with local implementations and realistic mock data.
 
-To switch to live integrations, fill in the relevant keys in `backend/.env` and flip the `USE_MOCK_*` flags to `false`.
+| Component        | Demo Mode                               | Live Mode                    |
+| ---------------- | --------------------------------------- | ---------------------------- |
+| Email & Calendar | Realistic Contoso Corporation mock data | Microsoft 365 via Graph API  |
+| Speech-to-Text   | Browser Web Speech API                  | OpenAI Whisper               |
+| Text-to-Speech   | Browser `speechSynthesis`               | OpenAI TTS                   |
+| Authentication   | Local mock login with role selection    | Microsoft Azure AD OAuth 2.0 |
+| Intent fallback  | Regex rules only                        | Regex rules + GPT-4o-mini    |
+
+To enable live integrations, configure the relevant environment variables in `backend/.env` and set the appropriate `USE_MOCK_*` flags to `false`.
 
 ---
 
-## Voice commands
+## Example Voice Commands
 
-These all work out of the box in demo mode:
+All of the following commands work in demo mode.
 
-**Calendar**
-```
+### Calendar
+
+```text
 What's on my calendar today?
-Show me this week's meetings
-Schedule a meeting with Sarah tomorrow at 2 PM
-Book a one-hour check-in with Ali on Monday at 10
-Delete my 3 PM meeting
+Show me this week's meetings.
+Schedule a meeting with Sarah tomorrow at 2 PM.
+Book a one-hour check-in with Ali on Monday at 10.
+Delete my 3 PM meeting.
 ```
 
-**Email**
-```
-Read my emails
-Summarise my inbox
-Send an email to James about the project update
+### Email
+
+```text
+Read my emails.
+Summarise my inbox.
+Send an email to James about the project update.
 ```
 
-**Manager — team calendars**
-```
-Show Sarah's calendar
-Check Jamie's schedule for this week
+### Manager Team Calendars
+
+```text
+Show Sarah's calendar.
+Check Jamie's schedule for this week.
 ```
 
-**Availability**
-```
+### Availability
+
+```text
 Am I free tomorrow afternoon?
-Check availability for a meeting with the team on Friday
+Check availability for a meeting with the team on Friday.
 ```
 
-The intent engine runs deterministic regex rules first (30+ patterns with entity extraction). If confidence is low and the LLM fallback is enabled, it hands off to GPT-4o-mini.
+The intent engine first evaluates requests using a deterministic regex rules engine containing 30+ patterns with entity extraction.
+
+If confidence is low and the LLM fallback is enabled, the request can be passed to GPT-4o-mini for further interpretation.
 
 ---
 
 ## Configuration
 
-Key variables in `backend/.env`:
+The main configuration options are stored in `backend/.env`.
 
-| Variable | Default | Description |
-|---|---|---|
-| `APP_SECRET_KEY` | — | JWT signing secret (minimum 32 characters) |
-| `USE_MOCK_GRAPH` | `true` | Use mock email/calendar data instead of live Graph API |
-| `USE_MOCK_STT` | `true` | Disable backend Whisper (browser STT is used) |
-| `USE_MOCK_TTS` | `true` | Disable OpenAI TTS (browser speechSynthesis is used) |
-| `USE_LLM_INTENT` | `false` | Enable GPT-4o-mini intent fallback |
-| `AZURE_TENANT_ID` | — | Azure AD tenant ID |
-| `AZURE_CLIENT_ID` | — | Azure AD app client ID |
-| `AZURE_CLIENT_SECRET` | — | Azure AD app secret |
-| `OPENAI_API_KEY` | — | Enables Whisper STT and tts-1 voice output |
-| `MANAGER_EMAILS` | — | Comma-separated emails to assign Manager role |
-| `ADMIN_EMAILS` | — | Comma-separated emails to assign Admin role |
-| `DATABASE_URL` | `sqlite+aiosqlite:///./ipa.db` | Database connection string |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | `480` | JWT expiry (8 hours) |
-
----
-
-## Roles and permissions
-
-| Permission | Employee | Manager | Admin |
-|---|:---:|:---:|:---:|
-| Read own email | ✓ | ✓ | ✓ |
-| Send email | ✓ | ✓ | ✓ |
-| Read own calendar | ✓ | ✓ | ✓ |
-| Write own calendar | ✓ | ✓ | ✓ |
-| Read team calendars | — | ✓ | ✓ |
-| Schedule meetings | — | ✓ | ✓ |
-| Modify any meeting | — | ✓ | ✓ |
-| View audit log | — | ✓ | ✓ |
-| Manage users | — | — | ✓ |
-| Access diagnostics | — | — | ✓ |
+| Variable                      | Default                        | Description                                                |
+| ----------------------------- | ------------------------------ | ---------------------------------------------------------- |
+| `APP_SECRET_KEY`              | —                              | JWT signing secret. Minimum 32 characters.                 |
+| `USE_MOCK_GRAPH`              | `true`                         | Use mock email/calendar data instead of Microsoft Graph.   |
+| `USE_MOCK_STT`                | `true`                         | Disable backend Whisper and use browser STT.               |
+| `USE_MOCK_TTS`                | `true`                         | Disable OpenAI TTS and use browser speech synthesis.       |
+| `USE_LLM_INTENT`              | `false`                        | Enable GPT-4o-mini intent fallback.                        |
+| `AZURE_TENANT_ID`             | —                              | Azure AD tenant ID.                                        |
+| `AZURE_CLIENT_ID`             | —                              | Azure AD application/client ID.                            |
+| `AZURE_CLIENT_SECRET`         | —                              | Azure AD application secret.                               |
+| `OPENAI_API_KEY`              | —                              | Enables Whisper and OpenAI TTS integrations.               |
+| `MANAGER_EMAILS`              | —                              | Comma-separated email addresses assigned the Manager role. |
+| `ADMIN_EMAILS`                | —                              | Comma-separated email addresses assigned the Admin role.   |
+| `DATABASE_URL`                | `sqlite+aiosqlite:///./ipa.db` | Database connection string.                                |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | `480`                          | JWT expiration time in minutes.                            |
 
 ---
 
-## Project structure
+## Roles and Permissions
 
-```
+| Permission          | Employee | Manager | Admin |
+| ------------------- | :------: | :-----: | :---: |
+| Read own email      |     ✓    |    ✓    |   ✓   |
+| Send email          |     ✓    |    ✓    |   ✓   |
+| Read own calendar   |     ✓    |    ✓    |   ✓   |
+| Write own calendar  |     ✓    |    ✓    |   ✓   |
+| Read team calendars |     —    |    ✓    |   ✓   |
+| Schedule meetings   |     —    |    ✓    |   ✓   |
+| Modify any meeting  |     —    |    ✓    |   ✓   |
+| View audit log      |     —    |    ✓    |   ✓   |
+| Manage users        |     —    |    —    |   ✓   |
+| Access diagnostics  |     —    |    —    |   ✓   |
+
+---
+
+## Project Structure
+
+```text
 ipa-corporate/
 ├── backend/
 │   ├── app/
 │   │   ├── api/
-│   │   │   └── routes/          # FastAPI route handlers (voice, email, calendar, auth, audit, admin)
-│   │   ├── core/                # config, security (JWT), RBAC, audit logger
+│   │   │   └── routes/          # FastAPI route handlers
+│   │   │                             # voice, email, calendar, auth, audit, admin
+│   │   ├── core/                # Configuration, security, RBAC, audit logging
 │   │   ├── integrations/
-│   │   │   └── graph/           # Microsoft Graph adapter (mock + real)
-│   │   │   └── stt/             # Speech-to-text providers (mock, Whisper)
-│   │   │   └── tts/             # Text-to-speech providers (mock, OpenAI, browser)
-│   │   ├── intents/             # Hybrid intent classifier (rules engine + LLM parser)
-│   │   ├── schemas/             # Pydantic request/response models
-│   │   └── services/            # Business logic (email, calendar, voice)
+│   │   │   ├── graph/           # Microsoft Graph adapter (mock + real)
+│   │   │   ├── stt/             # Speech-to-text providers
+│   │   │   └── tts/             # Text-to-speech providers
+│   │   ├── intents/              # Hybrid intent classifier
+│   │   ├── schemas/              # Pydantic request/response models
+│   │   └── services/             # Email, calendar and voice business logic
 │   ├── .env.example
 │   └── requirements.txt
+│
 ├── frontend/
 │   └── src/
-│       ├── components/          # Shared UI (AppShell, modals, layout)
-│       ├── features/            # Domain panels (voice, email, calendar, audit, admin)
-│       ├── hooks/               # useAuth, useVoice
-│       ├── pages/               # Route-level page components
-│       ├── services/api/        # Typed API client wrappers
-│       └── types/               # TypeScript interfaces and enums
-├── docs/                        # Architecture, security, API reference, demo guide
+│       ├── components/           # Shared UI components
+│       ├── features/             # Voice, email, calendar, audit and admin
+│       ├── hooks/                # useAuth, useVoice
+│       ├── pages/                # Route-level page components
+│       ├── services/
+│       │   └── api/              # Typed API client wrappers
+│       └── types/                # TypeScript interfaces and enums
+│
+├── docs/                         # Project documentation
 ├── docker-compose.yml
 └── Makefile
 ```
 
 ---
 
-## Docs
+## Documentation
 
-| Document | What's in it |
-|---|---|
-| [`docs/architecture.md`](docs/architecture.md) | System design, component diagram, data flow |
-| [`docs/requirements.md`](docs/requirements.md) | Functional and non-functional requirements |
-| [`docs/security.md`](docs/security.md) | Threat model, STRIDE analysis, RBAC matrix |
-| [`docs/testing.md`](docs/testing.md) | Testing strategy and coverage approach |
-| [`docs/evaluation.md`](docs/evaluation.md) | SUS usability evaluation methodology |
-| [`docs/api-reference.md`](docs/api-reference.md) | Full REST API endpoint reference |
-| [`docs/demo-guide.md`](docs/demo-guide.md) | Demo script and viva Q&A prep |
-| [`docs/risk-register.md`](docs/risk-register.md) | Project risk register |
-
----
-
-## Audit logging
-
-Every sensitive action — login, email read/send, calendar changes, employee calendar access, voice command classifications, permission denials — gets written to an append-only JSONL file at `backend/logs/audit.jsonl`. Managers and Admins can query it live via `/api/audit/logs`.
-
-Email bodies and voice transcripts are never stored. Only the intent, actor, and outcome go into the log.
+| Document                                         | Description                                    |
+| ------------------------------------------------ | ---------------------------------------------- |
+| [`docs/architecture.md`](docs/architecture.md)   | System design, component diagram and data flow |
+| [`docs/requirements.md`](docs/requirements.md)   | Functional and non-functional requirements     |
+| [`docs/security.md`](docs/security.md)           | Threat model, STRIDE analysis and RBAC matrix  |
+| [`docs/testing.md`](docs/testing.md)             | Testing strategy and coverage approach         |
+| [`docs/evaluation.md`](docs/evaluation.md)       | SUS usability evaluation methodology           |
+| [`docs/api-reference.md`](docs/api-reference.md) | REST API endpoint reference                    |
+| [`docs/demo-guide.md`](docs/demo-guide.md)       | Demo script and viva preparation               |
+| [`docs/risk-register.md`](docs/risk-register.md) | Project risk register                          |
 
 ---
 
-*Convo — Final Year Computing Project. The Contoso Corporation personas and data are fictional and used for demonstration purposes only.*
-#   C o n v o  
- 
+## Audit Logging
+
+Every sensitive operation is recorded in an append-only JSONL audit file:
+
+```text
+backend/logs/audit.jsonl
+```
+
+Examples of logged events include:
+
+* Login attempts
+* Email reads and sends
+* Calendar changes
+* Employee calendar access
+* Voice command classifications
+* Permission denials
+
+Managers and Administrators can query the audit log through:
+
+```text
+/api/audit/logs
+```
+
+The audit system intentionally avoids storing sensitive content.
+
+**Email bodies and voice transcripts are never stored.** Only relevant metadata, such as the actor, action, intent, and outcome, is recorded.
+
+---
+
+## Project Scope and Demo Data
+
+Convo uses fictional **Contoso Corporation** personas and data for demonstration purposes.
+
+The project is intended as a final-year computing project demonstrating:
+
+* Voice-based human-computer interaction
+* Natural-language intent classification
+* Role-based access control
+* Microsoft Graph integration
+* Confirmation-based action workflows
+* Secure audit logging
+* Modern full-stack web development
+
+All Contoso Corporation data and personas included in the application are fictional and used solely for demonstration purposes.
+
+---
+
+## License
+
+This project was developed as part of a final-year computing project.
